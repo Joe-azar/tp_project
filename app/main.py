@@ -1,19 +1,11 @@
+from app.services.embedding_service import router as embedding_router
+from app.services.search_service import router as search_router
+from app.services.insert_service import router as insert_router
 from fastapi import FastAPI
-from app.models.document_model import Documents, Query
-from app.services.embedding_service import encode_documents
-from app.services.search_service import search_documents
-from app.services.db_service import insert_embeddings
 
-app = FastAPI()
+app = FastAPI(title="Embedding and Search API")
 
-@app.post("/encode_documents")
-async def encode_docs(documents: Documents):
-    return encode_documents(documents)
-
-@app.post("/search_documents")
-async def search_docs(query: Query):
-    return search_documents(query)
-
-@app.post("/insert_in_db")
-async def insert_in_db(data: dict):
-    return insert_embeddings(data["embeddings"])
+# Inclure les routes des services
+app.include_router(embedding_router, prefix="/api")
+app.include_router(search_router, prefix="/api")
+app.include_router(insert_router, prefix="/api")

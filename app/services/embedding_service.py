@@ -1,20 +1,27 @@
-from app.services.db_service import insert_embeddings
-from app.models.document_model import Documents
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
+import json
 
-# Charger le modèle d'embeddings
+router = APIRouter()
+
 model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 
-def encode_documents(documents: Documents):
-    encoded_data = []
+class Documents(BaseModel):
+    documents: list[str]
 
-    for index, text in enumerate(documents.documents):
-        embedding = model.encode(text).tolist()
-        encoded_data.append({
-            "id": index,
-            "text": text,
-            "embedding": embedding
-        })
+@router.post("/embed")
+async def embed_documents(request: Documents):
+    try:
+        embeddings = [
+            {"text": doc, "embedding": model.encode(doc).tolist()}
+            for doc in request.documents
+        ]
 
-    # Insérer directement dans le fichier JSON
-    return insert_embeddings(encoded_data)
+        # Stocker les résultats dans un fichier JSON
+        with open("data/embeddings.json", "w") as f:
+            json.dump(embeddings, f)
+
+        return {"status": "success", "message": "Documents encodés avec succès."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur d'encodage : {e}")
