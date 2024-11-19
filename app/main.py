@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from services.embedding_service import router as embedding_router
-from services.search_service import router as search_router
-from services.insert_service import router as insert_router
+from app.services.embedding_service import router as embedding_router
+from app.services.search_service import router as search_router
+from app.services.insert_service import router as insert_router
 
 app = FastAPI(title="Embedding and Search API")
 
