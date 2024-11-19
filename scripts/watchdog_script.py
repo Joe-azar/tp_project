@@ -14,7 +14,7 @@ class WatchdogHandler(FileSystemEventHandler):
             lines = [line.strip() for line in file if line.strip()]
 
         # Appeler le service d'encodage
-        url = "http://localhost:8000/embed"
+        url = "http://localhost:8000/api/embed"
         payload = {"documents": lines}
         try:
             response = requests.post(url, json=payload)
