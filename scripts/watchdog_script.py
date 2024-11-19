@@ -23,7 +23,7 @@ class WatchdogHandler(FileSystemEventHandler):
             print(f"Erreur API : {e}")
 
 if __name__ == "__main__":
-    folder_to_watch = "./app/data"
+    folder_to_watch = "./data"
     observer = Observer()
     event_handler = WatchdogHandler()
 

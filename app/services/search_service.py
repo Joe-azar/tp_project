@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import json
-from app.utils.cosine_similarity import cosine_similarity
-
+from utils.cosine_similarity import cosine_similarity
 
 router = APIRouter()
 
