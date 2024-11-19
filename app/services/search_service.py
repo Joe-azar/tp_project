@@ -2,6 +2,10 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import json
 from app.utils.cosine_similarity import cosine_similarity
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+
 
 router = APIRouter()
 
