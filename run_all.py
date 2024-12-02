@@ -20,6 +20,20 @@ def start_watchdog():
     """Lancer le script Watchdog pour surveiller les fichiers .txt."""
     subprocess.run(["python", "scripts/watchdog_script.py"])
 
+def wait_for_api():
+    """Attendre que l'API soit opérationnelle."""
+    url = "http://127.0.0.1:8000/docs"
+    for _ in range(10):  # Essayer 10 fois
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                print("API disponible.")
+                return True
+        except requests.ConnectionError:
+            pass
+        time.sleep(1)
+    raise Exception("L'API n'est pas disponible après 10 secondes.")
+
 # Fonction pour lancer l'interface graphique
 def start_gui():
     """Interface graphique avec Tkinter."""
@@ -92,8 +106,8 @@ def run_all_services():
     uvicorn_thread = threading.Thread(target=start_uvicorn)
     uvicorn_thread.start()
 
-    # Attendre un peu pour s'assurer que l'API est en ligne
-    time.sleep(5)
+    # Attendre que l'API soit en ligne
+    wait_for_api()
 
     # Démarrer le script Watchdog
     watchdog_thread = threading.Thread(target=start_watchdog)
