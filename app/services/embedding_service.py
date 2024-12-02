@@ -1,9 +1,14 @@
+from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 import json
 import requests  # Ajoutez requests pour faire un appel à /insert
+import os
 
+# Définir un chemin global pour les données
+DATA_DIR = Path("data")
+EMBEDDINGS_FILE = DATA_DIR / "embeddings.json"
 router = APIRouter()
 
 model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
@@ -20,11 +25,21 @@ async def embed_documents(request: Documents):
             for doc in request.documents
         ]
 
-        # Stocker les embeddings dans embeddings.json
-        with open("data/embeddings.json", "w") as f:
-            json.dump(embeddings, f)
+        # Charger les données existantes si le fichier existe
+        if EMBEDDINGS_FILE.exists():
+            with open(EMBEDDINGS_FILE, "r") as f:
+                existing_embeddings = json.load(f)
+        else:
+            existing_embeddings = []
 
-        # Envoyer les embeddings au service /insert
+        # Ajouter les nouveaux embeddings
+        existing_embeddings.extend(embeddings)
+
+        # Stocker les embeddings mis à jour
+        with open(EMBEDDINGS_FILE, "w") as f:
+            json.dump(existing_embeddings, f, indent=4)
+
+        # Appeler le service /insert
         response = requests.post("http://127.0.0.1:8000/api/insert", json={"records": embeddings})
         if response.status_code != 200:
             raise HTTPException(status_code=response.status_code, detail=response.json())
